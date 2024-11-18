@@ -24,23 +24,27 @@ def check_if_file_processed(directory, file_name):
 # Step 1: Ingest Data
 def ingest_data(file_path):
     
-    directory = os.path.dirname(file_path)
-    file_name = os.path.basename(file_path)
-    check_if_file_processed(directory, file_name)
-    
-    #Rename the file by adding the date
-    today=datetime.datetime.now().strftime("%Y%m%d")
-    file_path_date= file_name.split('.')[0]+"_"+today+'.'+file_name.split('.')[1]
-    os.chdir(directory)
-    os.rename(file_name,file_path_date)
+    if (file_path.endswith('.csv')) | (file_path.endswith('.xlsx')) :
+        #Rename the file by adding the date
+        directory = os.path.dirname(file_path)
+        file_name = os.path.basename(file_path)
+        today=datetime.datetime.now().strftime("%Y%m%d")
+        file_name_date= file_name.split('.')[0]+"_"+today+'.'+file_name.split('.')[1]
         
-    if file_path_date.endswith('.csv'):
-        df = pd.read_csv(file_path_date)
-    elif file_path_date.endswith('.xlsx'):
-        df = pd.read_excel(file_path_date)
+        os.chdir(directory)
+        os.rename(file_name,file_name_date)
+        
+        
+        check_if_file_processed(directory, file_name_date)
+    
+           
+        if file_name_date.endswith('.csv'):
+            df = pd.read_csv(file_name_date)
+        elif file_name_date.endswith('.xlsx'):
+            df = pd.read_excel(file_name_date)
     else:
         raise ValueError("Unsupported file format. Please provide a CSV or Excel file.")
-    return df,file_path_date
+    return df,file_name_date
     
 # Step 1.1: Validate the file - schema check
 def validate_dataframe_columns(dataframe, csv_file_path):
